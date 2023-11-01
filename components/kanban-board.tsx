@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { Plus } from "lucide-react"
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent } from "@dnd-kit/core"
+import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { SortableContext, arrayMove } from "@dnd-kit/sortable"
 import { createPortal } from "react-dom"
 
@@ -19,6 +19,14 @@ const KanbanBoard = () => {
 
     const [activeColumn, setActiveColumn] = useState<Column | null>(null)
 
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 3, // 3px
+            }
+        })
+    )
+
     console.log(columns)
 
     function createNewColumn() {
@@ -32,6 +40,15 @@ const KanbanBoard = () => {
 
     function generateId() {
         return Math.floor(Math.random() * 10001)
+    }
+
+    function updateColumn(id: Id, title: string) {
+        const newColumns = columns.map(column => {
+            if (column.id !== id) return column
+            return { ...column, title }
+        })
+
+        setColumns(newColumns)
     }
 
     function deleteColumn(id: Id) {
@@ -66,13 +83,19 @@ const KanbanBoard = () => {
         })
     }
 
+
     return (
         <div className="flex gap-x-4">
-            <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+            <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
                 <div className="flex gap-2 text-white">
                     <SortableContext items={columnsId}>
                         {columns.map((column) => (
-                            <ColumnContainer key={column.id} column={column} deleteColumn={deleteColumn} />
+                            <ColumnContainer 
+                                key={column.id} 
+                                column={column} 
+                                deleteColumn={deleteColumn} 
+                                updateColumn={updateColumn}
+                            />
                         ))}
                     </SortableContext>
                 </div>
@@ -86,6 +109,7 @@ const KanbanBoard = () => {
                             <ColumnContainer 
                                 column={activeColumn} 
                                 deleteColumn={deleteColumn} 
+                                updateColumn={updateColumn}
                             />}
                     </DragOverlay>,
                     document.body
