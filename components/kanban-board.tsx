@@ -160,6 +160,16 @@ const KanbanBoard = () => {
         setTasks(newTasks)
     }
 
+    const firstFixedColumn: Column = {
+        id: "first-fixed",
+        title: "Applied"
+    }
+
+    const lastFixedColumn: Column = {
+        id: "last-fixed",
+        title: "Hired"
+    }
+
 
     return (
         <div className="flex gap-x-4">
@@ -170,6 +180,15 @@ const KanbanBoard = () => {
                 onDragOver={onDragOver}
             >
                 <div className="flex gap-2 text-white">
+                    <ColumnContainer 
+                        column={firstFixedColumn}
+                        deleteColumn={() => {}} 
+                        updateColumn={() => {}}
+                        createTask={createTask}
+                        deleteTask={deleteTask}
+                        updateTask={updateTask}
+                        tasks={tasks.filter(task => task.columnId === firstFixedColumn.id)}
+                    />
                     <SortableContext items={columnsId}>
                         {columns.map((column) => (
                             <ColumnContainer 
@@ -184,6 +203,15 @@ const KanbanBoard = () => {
                             />
                         ))}
                     </SortableContext>
+                    <ColumnContainer 
+                        column={lastFixedColumn}
+                        deleteColumn={() => {}} 
+                        updateColumn={() => {}}
+                        createTask={createTask}
+                        deleteTask={deleteTask}
+                        updateTask={updateTask}
+                        tasks={tasks.filter(task => task.columnId === lastFixedColumn.id)}
+                    />
                 </div>
                 <Button onClick={() => {createNewColumn()}}>
                     <Plus className="h-4 w-4 mr-2" />

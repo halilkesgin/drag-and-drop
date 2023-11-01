@@ -57,7 +57,7 @@ const ColumnContainer = ({ column, deleteColumn, updateColumn, createTask, tasks
                         <div className="flex justify-between gap-x-4">
                             <div className="flex gap-x-4 items-center">
                                 <div className="flex justify-center items-center border h-10 w-10 border-slate-50/20 rounded-lg">
-                                    0
+                                    {tasksIds.length}
                                 </div>
                                 <div>
                                     {!editMode && 
@@ -79,7 +79,7 @@ const ColumnContainer = ({ column, deleteColumn, updateColumn, createTask, tasks
                                 </div>
                             </div>
                             <Button variant="destructive" size="icon" onClick={() => { deleteColumn(column.id) }}>
-                                <Trash className="h-4 w-4" />
+                                <Trash className="h-4 w-4"  />
                             </Button>
                         </div>
                 </CardTitle>
