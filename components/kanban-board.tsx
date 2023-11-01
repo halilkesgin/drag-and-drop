@@ -1,15 +1,21 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Plus } from "lucide-react"
+import { DndContext } from "@dnd-kit/core"
+import { SortableContext } from "@dnd-kit/sortable"
+
+import { Column, Id } from "@/lib/types"
 
 import { Button } from "./ui/button"
-import { Column, Id } from "@/lib/types"
 import ColumnContainer from "./column-container"
+
 
 const KanbanBoard = () => {
 
     const [columns, setColumns] = useState<Column[]>([])
+    const columnsId = useMemo(() => columns.map(col => col.id), [columns])
+
     console.log(columns)
 
     function createNewColumn() {
@@ -33,15 +39,19 @@ const KanbanBoard = () => {
 
     return (
         <div className="flex gap-x-4">
-            <div className="flex gap-2 text-white">
-                {columns.map((column) => (
-                    <ColumnContainer key={column.id} column={column} deleteColumn={deleteColumn} />
-                ))}
-            </div>
-            <Button onClick={() => {createNewColumn()}}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Column
-            </Button>
+            <DndContext>
+                <div className="flex gap-2 text-white">
+                    <SortableContext items={columnsId}>
+                        {columns.map((column) => (
+                            <ColumnContainer key={column.id} column={column} deleteColumn={deleteColumn} />
+                        ))}
+                    </SortableContext>
+                </div>
+                <Button onClick={() => {createNewColumn()}}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Column
+                </Button>
+            </DndContext>
         </div>
     )
 }
