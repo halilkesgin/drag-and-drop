@@ -1,23 +1,31 @@
-import { Trash } from "lucide-react"
-import { useSortable } from "@dnd-kit/sortable"
+import { Plus, Trash } from "lucide-react"
+import { SortableContext, useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 
-import { Column, Id } from "@/lib/types"
+import { Column, Id, Task } from "@/lib/types"
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
+import TaskCard from "./task-card"
 
 interface ColumnContainerProps {
     column: Column
     deleteColumn: (id: Id) => void
     updateColumn: (id: Id, title: string) => void
+    createTask: (columnId: Id) => void
+    deleteTask: (id: Id) => void
+    updateTask: (id: Id, content: string) => void
+    tasks: Task[]
 }
 
-const ColumnContainer = ({ column, deleteColumn, updateColumn }: ColumnContainerProps) => {
+const ColumnContainer = ({ column, deleteColumn, updateColumn, createTask, tasks, deleteTask, updateTask }: ColumnContainerProps) => {
 
     const [editMode, setEditMode] = useState(false)
+    const tasksIds = useMemo(() => {
+        return tasks.map(task => task.id)
+    }, [tasks])
 
     const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
         id: column.id,
@@ -39,6 +47,8 @@ const ColumnContainer = ({ column, deleteColumn, updateColumn }: ColumnContainer
             </Card>
         )
     }
+
+
 
     return (
         <Card className="bg-primary flex gap-y-4 flex-col border-slate-50/20 w-[350px] h-[500px] max-h-[500px]" ref={setNodeRef} style={style}>
@@ -75,13 +85,30 @@ const ColumnContainer = ({ column, deleteColumn, updateColumn }: ColumnContainer
                 </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-grow">
-                <div className="text-white">
-                    Hello
+                <div className="text-white flex flex-col w-full gap-y-4">
+                    <SortableContext items={tasksIds}>
+                        {tasks?.map((task) => (
+                             <TaskCard 
+                                 key={task.id} 
+                                 task={task} 
+                                 deleteTask={deleteTask}
+                                 updateTask={updateTask}
+                             />
+                        ))}
+                    </SortableContext>
+
                 </div>
             </CardContent>
             <CardFooter>
                 <div className="text-white">
-                    Footer
+                    <Button 
+                        variant="secondary" 
+                        className="w-full"
+                        onClick={() => { createTask(column.id) }}
+                    >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Task
+                    </Button>
                 </div>
             </CardFooter>
        </Card>
